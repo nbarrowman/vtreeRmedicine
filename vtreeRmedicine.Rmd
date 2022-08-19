@@ -1,0 +1,265 @@
+---
+title: "&nbsp;"
+#author: "(c) Nick Barrowman 2022"
+output:
+#  xaringan::moon_reader:
+#    css: [default, custom.css]
+#    lib_dir: libs
+#    nature:
+#      highlightStyle: github
+#      countIncrementalSlides: false
+  slidy_presentation:
+    css: styles.css
+    theme: united
+    font_adjustment: 8
+    footer: "Discovering hidden patterns in clinical data (c) Nick Barrowman 2022"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width=132)
+```
+
+---
+
+# CONSORT diagrams
+
+* The randomized controlled trial (or RCT) is one of humanity's greatest achievements.
+
+* It's considered the gold standard of evidence about interventions.
+
+* But to live up to this billing, an RCT has to be done **well**, and for readers to have confidence in the results of an RCT, there has to be transparent reporting.
+
+* A major step forward in this regard was the CONSORT statement, originally published in 1996, a key element of which is the CONSORT diagram.
+
+------------------------------------------------------[Show CONSORT diagram]------------------------------------------------------
+
+* Here is a CONSORT diagram. It's from the randomized trial of paxlovid antiviral treatment for Covid published in April in the New England Journal of Medicine.
+
+* The CONSORT diagram is key because it shows exactly how the study sample was obtained, starting with people assessed for eligibility in the study, through informed consent, randomization, and finally data analysis.
+
+---
+
+```{r, echo=FALSE, fig.alt="Hammond J, Leister-Tebbe H, Gardner A, et al. Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19. N Engl J Med. 2022;386(15):1397-1408.",out.width="60%",fig.align = 'center'}
+knitr::include_graphics("paxlovid.png")
+```
+
+---
+
+# The story of vtree
+
+* If you work out the numbers to fill in to a CONSORT diagram by hand, 
+it can be quite error prone.
+
+* I wanted to reproducibly draw what I call "sample selection flow diagrams".
+
+* These are tree diagrams, and a tree is a simple graph (i.e. a node-and-edge diagram).
+
+* The **DiagrammeR** package lets you draw graphs (node and edge diagrams) based on the **Graphviz** software and the **DOT** language.
+
+* But how can you calculate the numbers automatically?
+
+* You could specify a fixed structure for the CONSORT diagram,
+but then the program would only work for that particular structure.
+I wanted it to work for all kinds of sample selection flow diagrams.
+
+* It turned out to be easier to solve a more general problem:
+making a tree of nested subsets based on the values of variables.
+
+* I called this a variable tree, and hence the package became **vtree**.
+
+* It turns out that variable trees are very useful for all kinds of data exploration.
+
+* But let's start with the original example: a CONSORT diagram.
+
+---
+
+```{r, echo=FALSE}
+library(vtree)
+```
+
+```{r, echo=FALSE}
+p <- build.data.frame(
+  c(  "rand","exc1","exc2","oth1", "group","died","dis1","dis2","dis3","fu"),
+  list(F,    T,     F,     F,      NA,     NA,    NA,    NA,    NA,    FALSE, 124),
+  list(F,    F,     T,     F,      NA,     NA,    NA,    NA,    NA,    FALSE, 11),
+  list(F,    F,     F,     T,      NA,     NA,    NA,    NA,    NA,    FALSE, 2),
+  list(T,    F,     F,     F,      "A",    F,     T,     F,     F,     FALSE, 11),
+  list(T,    F,     F,     F,      "A",    F,     F,     T,     F,     FALSE, 43),
+  list(T,    F,     F,     F,      "A",    F,     F,     F,     T,     FALSE, 13),
+  list(T,    F,     F,     F,      "A",    F,     F,     F,     T,     TRUE, 1053),
+  list(T,    F,     F,     F,      "B",    T,     F,     F,     F,     FALSE, 13),
+  list(T,    F,     F,     F,      "B",    F,     T,     F,     F,     FALSE, 9),
+  list(T,    F,     F,     F,      "B",    F,     F,     T,     F,     FALSE, 43),
+  list(T,    F,     F,     F,      "B",    F,     F,     F,     T,     FALSE, 12),
+  list(T,    F,     F,     F,      "B",    F,     F,     F,     F,     TRUE, 1049))
+```
+
+# The paxlovid CONSORT diagram
+
+* **vtree** takes a data frame as input.
+
+* I created a data frame, `p`, based on the paxlovid trial.
+
+```{r}
+dim(p)
+```
+
+A total of 2383 patients were assessed for eligibility in the paxlovid trial.
+
+```{r}
+head(p)
+```
+
+---
+
+# A single layer tree
+
+```{r}
+table(p$rand)
+```
+
+```{r,message=FALSE,out.width="40%"}
+vtree(p, "rand", horiz=FALSE)
+```
+
+---
+
+# A two-layer tree
+
+```{r}
+table(p$rand, p$group, exclude=NULL)
+```
+
+```{r,message=FALSE,out.width="40%"}
+vtree(p, "rand group", horiz=FALSE)
+```
+  
+---
+
+# Pruning a node that is not necessary
+
+```{r,message=FALSE,out.width="40%"}
+vtree(p, "rand group", follow=list(rand=TRUE), horiz=FALSE)
+```
+
+---
+
+# A three-layer tree
+
+```{r,message=FALSE,out.width="40%"}
+vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE)
+```
+
+---
+
+
+# Adding labels
+
+```{r,message=FALSE,out.width="40%"}
+vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALSE, title="Assessed for eligibility",
+  labelnode=list(rand=c(Excluded=FALSE, Randomized=TRUE), fu=c("Discontinued trial"=FALSE, "Followed up"=TRUE)))
+```
+
+---
+
+# Summary text + some finishing touches
+
+```{r,message=FALSE,out.width="40%"}
+vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALSE, title="Assessed for eligibility", 
+  labelnode=list(rand=c(Excluded=FALSE, Randomized=TRUE), fu=c("Discontinued trial"=FALSE, "Followed up"=TRUE)),
+  summary=c("exc1 \nDid not meet eligibility criteria: %sum%%var=rand%%node=FALSE%", "exc2 \nWithdrew: %sum%%var=rand%%node=FALSE%",  
+            "oth1 \nHad other reason: %sum%%var=rand%%node=FALSE%", "died \nDied: %sum%%var=fu%%node=FALSE%",  
+            "dis1 \nLost to follow-up: %sum%%var=fu%%node=FALSE%", "dis2 \nWithdrew: %sum%%var=fu%%node=FALSE%",  
+            "dis3 \nHad other reason: %sum%%var=fu%%node=FALSE%"),
+  splitwidth=Inf, fillcolor="white", rootfillcolor="white", showpct=FALSE)
+```
+
+---
+
+# Vtree was originally designed to draw flow diagrams, but its generality makes it good for all kinds of data exploraton tasks
+
+Let's look at a dataset from a retrospective cohort study.
+The study focused on the risk of cytomegalovirus reactivation in
+cancer patients being treated with bone marrow stem cell transplant.
+
+> Sobecks et al. “Cytomegalovirus Reactivation After Matched Sibling Donor
+> Reduced-Intensity Conditioning Allogeneic Hematopoietic Stem Cell Transplant
+> Correlates With Donor Killer Immunoglobulin-like Receptor Genotype”. Exp Clin
+> Transplant 2011; 1: 7-13.
+
+The data frame is from the package `medicaldata`.
+
+```{r, warning=FALSE}
+library(medicaldata)
+```
+
+```{r}
+dim(cytomegalovirus)
+```
+
+> This data set contains 64 consecutive patients who underwent T-cell replete,
+> matched sibling donor reduced-intensity conditioning allogeneic hematopoietic stem
+> cell transplant.
+
+```{r}
+print(names(cytomegalovirus),quote = FALSE)
+```
+
+---
+
+# Simple descriptives
+
+```{r, out.width="30%", fig.align="center"}
+vtree(cytomegalovirus,"diagnosis",sameline=TRUE)
+```
+
+```{r,message=FALSE,out.width="30%"}
+vtree(cytomegalovirus, "prior.transplant")
+```
+
+Could use `labelnode` to relabel:
+
+```{r,message=FALSE,out.width="30%"}
+vtree(cytomegalovirus, "prior.transplant", labelnode=list(prior.transplant=c(No=0,Yes=1)))
+```
+
+---
+
+For convenience, I have relabeled variables
+
+```{r, warning=FALSE, message=FALSE}
+library(forcats)
+library(dplyr)
+stemcell <- cytomegalovirus %>%
+  mutate(
+    sex              = fct_recode(as.character(sex), Male="1", Female="0"),
+    race             = fct_recode(as.character(race), White="1", "African American"="0"),
+    diagnosis.type   = fct_recode(as.character(diagnosis.type), Myeloid="1", Lymphoid="0"),
+    prior.transplant = fct_recode(as.character(prior.transplant), "No prior transplant"="0", "Prior transplant"="1"),
+    prior.radiation  = fct_recode(as.character(prior.radiation), "No radiation"="0", "Radiation"="1"),
+    c1c2             = fct_recode(as.character(`C1/C2`), Heterozygous="0", Homozygous="1"))  
+```
+
+```{r,message=FALSE,out.width="40%"}
+vtree(stemcell, "prior.transplant", showvarnames=FALSE)
+```
+
+---
+
+# Patterns
+
+```{r, out.width="45%", fig.align="center"}
+vtree(stemcell, "sex prior.transplant prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
+```
+
+---
+
+# CMV reactivation (R) post-transplant
+
+```{r,out.width="88%"}
+vtree(stemcell, "sex prior.transplant prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   R %npct%", splitwidth=Inf)
+```
+
+

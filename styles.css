@@ -1,0 +1,42 @@
+#nextsteps {
+   color: blue;
+}
+
+div.slide.titlepage {
+  text-align: center;
+    background-image: url(Rmedicine_title_screen.png);
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;  
+}
+
+
+blockquote {
+  font-style: italic;
+  font-size: 20pt;
+}
+
+
+h1 {
+    font-size: 36pt !important;
+    color: darkblue;
+}
+
+ins {
+   font-size: 48pt;
+   color: DarkGreen;
+   text-decoration: none;
+}
+
+pre {
+  margin-left: 0;
+}
+
+li code {
+  font-weight: bold;
+}
+
+code {
+  font-weight: bold;
+}
