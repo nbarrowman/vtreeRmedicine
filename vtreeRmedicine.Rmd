@@ -17,7 +17,7 @@ output:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align="center")
 options(width=132)
 ```
 
@@ -138,7 +138,7 @@ vtree(p, "rand group", horiz=FALSE)
   
 ---
 
-# Pruning a node that is not necessary
+# Pruning a node
 
 ```{r,message=FALSE,out.width="40%"}
 vtree(p, "rand group", follow=list(rand=TRUE), horiz=FALSE)
@@ -180,7 +180,7 @@ vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALS
 
 # Vtree was originally designed to draw flow diagrams, but its generality makes it good for all kinds of data exploraton tasks
 
-Let's look at a dataset from a retrospective cohort study.
+Here's a dataset from a retrospective cohort study.
 The study focused on the risk of cytomegalovirus reactivation in
 cancer patients being treated with bone marrow stem cell transplant.
 
@@ -193,9 +193,6 @@ The data frame is from the package `medicaldata`.
 
 ```{r, warning=FALSE}
 library(medicaldata)
-```
-
-```{r}
 dim(cytomegalovirus)
 ```
 
@@ -209,9 +206,9 @@ print(names(cytomegalovirus),quote = FALSE)
 
 ---
 
-# Simple descriptives
+# Frequencies
 
-```{r, out.width="30%", fig.align="center"}
+```{r, out.width="30%"}
 vtree(cytomegalovirus,"diagnosis",sameline=TRUE)
 ```
 
@@ -227,13 +224,14 @@ vtree(cytomegalovirus, "prior.transplant", labelnode=list(prior.transplant=c(No=
 
 ---
 
-For convenience, I have relabeled variables
+# Relabel variables for convenience
 
 ```{r, warning=FALSE, message=FALSE}
 library(forcats)
 library(dplyr)
 stemcell <- cytomegalovirus %>%
   mutate(
+    CMV              = fct_recode(as.character(cmv), "CMV reactivation"="1", "No CMV reactivation"="0"),
     sex              = fct_recode(as.character(sex), Male="1", Female="0"),
     race             = fct_recode(as.character(race), White="1", "African American"="0"),
     diagnosis.type   = fct_recode(as.character(diagnosis.type), Myeloid="1", Lymphoid="0"),
@@ -250,7 +248,7 @@ vtree(stemcell, "prior.transplant", showvarnames=FALSE)
 
 # Patterns
 
-```{r, out.width="45%", fig.align="center"}
+```{r, out.width="45%"}
 vtree(stemcell, "sex prior.transplant prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
 ```
 
@@ -260,6 +258,31 @@ vtree(stemcell, "sex prior.transplant prior.radiation c1c2", pattern=TRUE, showv
 
 ```{r,out.width="88%"}
 vtree(stemcell, "sex prior.transplant prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   R %npct%", splitwidth=Inf)
+```
+
+---
+
+# Quantitative variables
+
+Although vtree focuses on discrete variables, it has some support for quantitative variables.
+
+> The primary risk factor of interest was the number of activating killer
+> immunoglobulin-like receptors (aKIRs: 1-4 vs. 5-6).
+
+```{r, out.width="30%"}
+vtree(stemcell, "cmv", summary="aKIRs", labelnode=list(cmv=c("No"=0,"Yes"=1)), labelvar=c(cmv="CMV reactivation"))
+```
+
+```{r, out.width="30%", eval=FALSE, echo=FALSE}
+vtree(stemcell, "cmv", summary="aKIRs \naKIRS mean (SD) %mean% (%SD%)", labelnode=list(cmv=c("No"=0,"Yes"=1)), labelvar=c(cmv="CMV reactivation"))
+```
+
+---
+
+# Dichotomizing a quantitative variable
+
+```{r, out.width="30%"}
+vtree(stemcell, "aKIRs>=5", summary="cmv")
 ```
 
 
