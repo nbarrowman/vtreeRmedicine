@@ -1,3 +1,7 @@
+.slide {
+  font-size: 24pt;
+}
+
 #nextsteps {
    color: blue;
 }
@@ -23,6 +27,24 @@ h1 {
     color: darkblue;
 }
 
+h2 {
+    font-size: 32pt !important;
+    color: #0020C2;
+}
+
+h5 {
+    font-size: 24pt !important;
+    color: #0020C2;
+    text-align: center;
+}
+
+h6 {
+    margin-top: 48pt;
+    font-size: 48pt !important;
+    color: #0020C2;
+    text-align: center;
+}
+
 ins {
    font-size: 48pt;
    color: DarkGreen;
@@ -31,6 +53,9 @@ ins {
 
 pre {
   margin-left: 0;
+  font-size: 15pt;
+  line-height: 110%;  
+  padding-left: 20px;
 }
 
 li code {
@@ -39,4 +64,11 @@ li code {
 
 code {
   font-weight: bold;
+
+}
+
+code.sourceCode {
+  font-weight: bold;
+  font-size: 15pt;
+  line-height: 110%;  
 }

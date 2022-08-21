@@ -11,8 +11,7 @@ output:
   slidy_presentation:
     css: styles.css
     theme: united
-    font_adjustment: 8
-    footer: "Discovering hidden patterns in clinical data (c) Nick Barrowman 2022"
+    footer: "Discovering hidden patterns in clinical data with the vtree package (c) Nick Barrowman 2022"
 ---
 
 
@@ -21,6 +20,17 @@ knitr::opts_chunk$set(echo = TRUE, fig.align="center")
 options(width=132)
 ```
 
+---
+
+# **Outline of this talk**
+
+###### Part 1
+##### Drawing a CONSORT flow diagram
+
+###### Part 2
+##### Data exploration 
+
+```{r, eval=FALSE,echo=FALSE}
 ---
 
 # CONSORT diagrams
@@ -38,6 +48,28 @@ options(width=132)
 * Here is a CONSORT diagram. It's from the randomized trial of paxlovid antiviral treatment for Covid published in April in the New England Journal of Medicine.
 
 * The CONSORT diagram is key because it shows exactly how the study sample was obtained, starting with people assessed for eligibility in the study, through informed consent, randomization, and finally data analysis.
+```
+
+---
+
+# **Part 1: Drawing a CONSORT flow diagram**
+
+```{r, echo=FALSE, fig.alt="CONSORT flow diagram",out.width="50%",fig.align = 'center'}
+knitr::include_graphics("CONSORT.png")
+```
+
+---
+
+# Paxlovid: an oral antiviral for treating COVID-19
+
+```{r, echo=FALSE, fig.alt="Biden has begun taking Paxlovid, an antiviral medication shown to prevent serious Covid cases",out.width="60%",fig.align = 'center'}
+knitr::include_graphics("biden.png")
+```
+
+Does paxlovid reduce hospitalization or death in the first 28 days after start of treatment?
+
+> Hammond J, Leister-Tebbe H, Gardner A, et al. Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19. N Engl J Med. 2022;386(15):1397-1408.
+
 
 ---
 
@@ -45,6 +77,7 @@ options(width=132)
 knitr::include_graphics("paxlovid.png")
 ```
 
+```{r, eval=FALSE,echo=FALSE}
 ---
 
 # The story of vtree
@@ -72,11 +105,13 @@ making a tree of nested subsets based on the values of variables.
 * It turns out that variable trees are very useful for all kinds of data exploration.
 
 * But let's start with the original example: a CONSORT diagram.
+```
 
 ---
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(vtree)
+library(dplyr)
 ```
 
 ```{r, echo=FALSE}
@@ -88,25 +123,31 @@ p <- build.data.frame(
   list(T,    F,     F,     F,      "A",    F,     T,     F,     F,     FALSE, 11),
   list(T,    F,     F,     F,      "A",    F,     F,     T,     F,     FALSE, 43),
   list(T,    F,     F,     F,      "A",    F,     F,     F,     T,     FALSE, 13),
-  list(T,    F,     F,     F,      "A",    F,     F,     F,     T,     TRUE, 1053),
+  list(T,    F,     F,     F,      "A",    F,     F,     F,     F,     TRUE, 1053),
   list(T,    F,     F,     F,      "B",    T,     F,     F,     F,     FALSE, 13),
   list(T,    F,     F,     F,      "B",    F,     T,     F,     F,     FALSE, 9),
   list(T,    F,     F,     F,      "B",    F,     F,     T,     F,     FALSE, 43),
   list(T,    F,     F,     F,      "B",    F,     F,     F,     T,     FALSE, 12),
   list(T,    F,     F,     F,      "B",    F,     F,     F,     F,     TRUE, 1049))
+#illustrate <- c(1,125,136,138,149,192,205,1258,1271,1380,1423,1435)
+illustrate <- c(125,1380,192,205,1258,1)
+p <- rbind(p[illustrate,],p[-illustrate,])
+p <- data.frame(tibble(p)) # reset row numbers
 ```
 
 # The paxlovid CONSORT diagram
 
-* **vtree** takes a data frame as input.
+* I noticed an apparent error in the published CONSORT diagram: 2396 patients were assessed for eligibility and then 137 were excluded (which would leave **2259**) but the diagram indicates that only **2246** were randomized
 
-* I created a data frame, `p`, based on the paxlovid trial.
+* I will assume 2396 is a misprint, and that in fact 2383 were assessed for eligibility
+
+* **vtree** takes a data frame as input
+
+* I made a data frame, `p`, representing the flow of each patient
 
 ```{r}
 dim(p)
 ```
-
-A total of 2383 patients were assessed for eligibility in the paxlovid trial.
 
 ```{r}
 head(p)
@@ -169,36 +210,35 @@ vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALS
 ```{r,message=FALSE,out.width="40%"}
 vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALSE, title="Assessed for eligibility", 
   labelnode=list(rand=c(Excluded=FALSE, Randomized=TRUE), fu=c("Discontinued trial"=FALSE, "Followed up"=TRUE)),
-  summary=c("exc1 \nDid not meet eligibility criteria: %sum%%var=rand%%node=FALSE%", "exc2 \nWithdrew: %sum%%var=rand%%node=FALSE%",  
-            "oth1 \nHad other reason: %sum%%var=rand%%node=FALSE%", "died \nDied: %sum%%var=fu%%node=FALSE%",  
-            "dis1 \nLost to follow-up: %sum%%var=fu%%node=FALSE%", "dis2 \nWithdrew: %sum%%var=fu%%node=FALSE%",  
-            "dis3 \nHad other reason: %sum%%var=fu%%node=FALSE%"),
+  summary=c("exc1 \nDid not meet eligibility criteria: %sum%%var=rand%%node=FALSE%",
+    "exc2 \nWithdrew: %sum%%var=rand%%node=FALSE%", "oth1 \nHad other reason: %sum%%var=rand%%node=FALSE%",
+    "died \nDied: %sum%%var=fu%%node=FALSE%", "dis1 \nLost to follow-up: %sum%%var=fu%%node=FALSE%",
+    "dis2 \nWithdrew: %sum%%var=fu%%node=FALSE%", "dis3 \nHad other reason: %sum%%var=fu%%node=FALSE%"),
   splitwidth=Inf, fillcolor="white", rootfillcolor="white", showpct=FALSE)
 ```
 
 ---
 
-# Vtree was originally designed to draw flow diagrams, but its generality makes it good for all kinds of data exploraton tasks
+# **Part 2: Data Exploration**
 
-Here's a dataset from a retrospective cohort study.
-The study focused on the risk of cytomegalovirus reactivation in
-cancer patients being treated with bone marrow stem cell transplant.
+---
+
+# A retrospective cohort study
+
+Here's a dataset from the **medicaldata** package, as reported in this paper:
 
 > Sobecks et al. “Cytomegalovirus Reactivation After Matched Sibling Donor
 > Reduced-Intensity Conditioning Allogeneic Hematopoietic Stem Cell Transplant
 > Correlates With Donor Killer Immunoglobulin-like Receptor Genotype”. Exp Clin
 > Transplant 2011; 1: 7-13.
 
-The data frame is from the package `medicaldata`.
+It's about the risk of cytomegalovirus (CMV) reactivation in patients being treated with bone marrow stem cell transplant
+
 
 ```{r, warning=FALSE}
 library(medicaldata)
 dim(cytomegalovirus)
 ```
-
-> This data set contains 64 consecutive patients who underwent T-cell replete,
-> matched sibling donor reduced-intensity conditioning allogeneic hematopoietic stem
-> cell transplant.
 
 ```{r}
 print(names(cytomegalovirus),quote = FALSE)
@@ -224,7 +264,7 @@ vtree(cytomegalovirus, "prior.transplant", labelnode=list(prior.transplant=c(No=
 
 ---
 
-# Relabel variables for convenience
+# For convenience, I'll relabel some variables
 
 ```{r, warning=FALSE, message=FALSE}
 library(forcats)
@@ -249,7 +289,7 @@ vtree(stemcell, "prior.transplant", showvarnames=FALSE)
 # Patterns
 
 ```{r, out.width="45%"}
-vtree(stemcell, "sex prior.transplant prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
+vtree(stemcell, "sex prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
 ```
 
 ---
@@ -257,7 +297,7 @@ vtree(stemcell, "sex prior.transplant prior.radiation c1c2", pattern=TRUE, showv
 # CMV reactivation (R) post-transplant
 
 ```{r,out.width="88%"}
-vtree(stemcell, "sex prior.transplant prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   R %npct%", splitwidth=Inf)
+vtree(stemcell, "sex prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   R %npct%", splitwidth=Inf)
 ```
 
 ---
@@ -269,12 +309,9 @@ Although vtree focuses on discrete variables, it has some support for quantitati
 > The primary risk factor of interest was the number of activating killer
 > immunoglobulin-like receptors (aKIRs: 1-4 vs. 5-6).
 
-```{r, out.width="30%"}
-vtree(stemcell, "cmv", summary="aKIRs", labelnode=list(cmv=c("No"=0,"Yes"=1)), labelvar=c(cmv="CMV reactivation"))
-```
-
-```{r, out.width="30%", eval=FALSE, echo=FALSE}
-vtree(stemcell, "cmv", summary="aKIRs \naKIRS mean (SD) %mean% (%SD%)", labelnode=list(cmv=c("No"=0,"Yes"=1)), labelvar=c(cmv="CMV reactivation"))
+```{r, out.width="50%"}
+vtree(stemcell, "cmv", summary="aKIRs \naKIRS mean (SD) %mean% (%SD%)", 
+  labelnode=list(cmv=c("No"=0,"Yes"=1)), labelvar=c(cmv="CMV reactivation"))
 ```
 
 ---
@@ -282,7 +319,20 @@ vtree(stemcell, "cmv", summary="aKIRs \naKIRS mean (SD) %mean% (%SD%)", labelnod
 # Dichotomizing a quantitative variable
 
 ```{r, out.width="30%"}
-vtree(stemcell, "aKIRs>=5", summary="cmv")
+vtree(stemcell, "aKIRs>=5", summary="cmv \nR: %npct%")
 ```
 
+---
 
+# Thanks!
+
+###### For more information
+##### vtree is available on CRAN
+##### There are lots of resources on the vtree webpage: https://nbarrowman.github.io/vtree
+
+###### Acknowledgements
+
+##### Richard Webster
+##### Sebastian Gatscha
+
+###### **Questions?**
