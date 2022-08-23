@@ -293,7 +293,7 @@ vtree(stemcell, "prior.transplant", showvarnames=FALSE)
 # Patterns
 
 ```{r, out.width="45%"}
-vtree(stemcell, "sex prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
+vtree(stemcell, "sex c1c2 prior.radiation", pattern=TRUE, showvarnames=FALSE)
 ```
 
 ---
@@ -301,7 +301,7 @@ vtree(stemcell, "sex prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
 # CMV reactivation (R) post-transplant
 
 ```{r,out.width="65%"}
-vtree(stemcell, "sex prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   \nR %npct%", splitwidth=Inf)
+vtree(stemcell, "sex c1c2 prior.radiation", sameline=TRUE, showvarnames=FALSE, summary="cmv   \nR %npct%", splitwidth=Inf)
 ```
 
 ---
