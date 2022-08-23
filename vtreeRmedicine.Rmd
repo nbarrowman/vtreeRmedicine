@@ -54,26 +54,26 @@ options(width=132)
 
 # **Part 1: Drawing a CONSORT flow diagram**
 
-```{r, echo=FALSE, fig.alt="CONSORT flow diagram",out.width="50%",fig.align = 'center'}
+```{r, echo=FALSE, fig.alt="CONSORT flow diagram",out.width="55%",fig.align = 'center'}
 knitr::include_graphics("CONSORT.png")
 ```
 
 ---
 
-# Paxlovid: an oral antiviral for treating COVID-19
+# Does treatment of COVID-19 with paxlovid reduce hospitalization or death?
 
 ```{r, echo=FALSE, fig.alt="Biden has begun taking Paxlovid, an antiviral medication shown to prevent serious Covid cases",out.width="60%",fig.align = 'center'}
 knitr::include_graphics("biden.png")
 ```
 
-Does paxlovid reduce hospitalization or death in the first 28 days after start of treatment?
+&nbsp;
 
 > Hammond J, Leister-Tebbe H, Gardner A, et al. Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19. N Engl J Med. 2022;386(15):1397-1408.
 
 
 ---
 
-```{r, echo=FALSE, fig.alt="Hammond J, Leister-Tebbe H, Gardner A, et al. Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19. N Engl J Med. 2022;386(15):1397-1408.",out.width="60%",fig.align = 'center'}
+```{r, echo=FALSE, fig.alt="Hammond J, Leister-Tebbe H, Gardner A, et al. Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19. N Engl J Med. 2022;386(15):1397-1408.",out.width="65%",fig.align = 'center'}
 knitr::include_graphics("paxlovid.png")
 ```
 
@@ -221,6 +221,12 @@ vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALS
 
 # **Part 2: Data Exploration**
 
+```{r, echo=FALSE, fig.alt="Spreadsheet magnifier",out.width="55%",fig.align = 'center'}
+knitr::include_graphics("spreadsheet_magnifier.png")
+```
+
+
+
 ---
 
 # A retrospective cohort study
@@ -252,13 +258,11 @@ print(names(cytomegalovirus),quote = FALSE)
 vtree(cytomegalovirus,"diagnosis",sameline=TRUE)
 ```
 
-```{r,message=FALSE,out.width="30%"}
+```{r,message=FALSE,out.width="30%",eval=FALSE,echo=FALSE}
 vtree(cytomegalovirus, "prior.transplant")
-```
 
 Could use `labelnode` to relabel:
 
-```{r,message=FALSE,out.width="30%"}
 vtree(cytomegalovirus, "prior.transplant", labelnode=list(prior.transplant=c(No=0,Yes=1)))
 ```
 
@@ -296,8 +300,8 @@ vtree(stemcell, "sex prior.radiation c1c2", pattern=TRUE, showvarnames=FALSE)
 
 # CMV reactivation (R) post-transplant
 
-```{r,out.width="88%"}
-vtree(stemcell, "sex prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   R %npct%", splitwidth=Inf)
+```{r,out.width="65%"}
+vtree(stemcell, "sex prior.radiation c1c2", sameline=TRUE, showvarnames=FALSE, summary="cmv   \nR %npct%", splitwidth=Inf)
 ```
 
 ---
@@ -328,7 +332,7 @@ vtree(stemcell, "aKIRs>=5", summary="cmv \nR: %npct%")
 
 ###### For more information
 ##### vtree is available on CRAN
-##### There are lots of resources on the vtree webpage: https://nbarrowman.github.io/vtree
+##### See also the vtree webpage: https://nbarrowman.github.io/vtree
 
 ###### Acknowledgements
 

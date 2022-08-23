@@ -23,6 +23,7 @@ blockquote {
 
 
 h1 {
+    margin-top: 20pt;
     font-size: 36pt !important;
     color: darkblue;
 }
@@ -33,15 +34,16 @@ h2 {
 }
 
 h5 {
-    font-size: 24pt !important;
-    color: #0020C2;
+    margin-top: 12pt;
+    font-size: 28pt !important;
+    color: #2554C7;
     text-align: center;
 }
 
 h6 {
     margin-top: 48pt;
     font-size: 48pt !important;
-    color: #0020C2;
+    color: #2554C7;
     text-align: center;
 }
 
