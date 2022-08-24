@@ -24,8 +24,12 @@ options(width=132)
 
 # **Outline of this talk**
 
+&nbsp;
+
 ###### Part 1
 ##### Drawing a CONSORT flow diagram
+
+&nbsp;
 
 ###### Part 2
 ##### Data exploration 
@@ -60,9 +64,9 @@ knitr::include_graphics("CONSORT.png")
 
 ---
 
-# Does treatment of COVID-19 with paxlovid reduce hospitalization or death?
+# Does treatment of COVID-19 with paxlovid reduce hospitalization and death?
 
-```{r, echo=FALSE, fig.alt="Biden has begun taking Paxlovid, an antiviral medication shown to prevent serious Covid cases",out.width="60%",fig.align = 'center'}
+```{r, echo=FALSE, fig.alt="Biden has begun taking Paxlovid, an antiviral medication shown to prevent serious Covid cases",out.width="60%",fig.align = 'center',out.extra='style="background-color: DarkGrey; padding:2px; display: block; margin-left: auto; margin-right: auto;"'}
 knitr::include_graphics("biden.png")
 ```
 
@@ -135,7 +139,7 @@ p <- rbind(p[illustrate,],p[-illustrate,])
 p <- data.frame(tibble(p)) # reset row numbers
 ```
 
-# The paxlovid CONSORT diagram
+# A data frame for the paxlovid CONSORT diagram
 
 * I noticed an apparent error in the published CONSORT diagram: 2396 patients were assessed for eligibility and then 137 were excluded (which would leave **2259**) but the diagram indicates that only **2246** were randomized
 
@@ -205,6 +209,26 @@ vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALS
 
 ---
 
+# Summaries in vtree
+
+```{r, eval=FALSE}
+summary="variable_name format_string"
+```
+
+The format string consists of text and special codes.
+
+For example, `exc1` indicates whether an individual was excluded because they didn't meet eligibility criteria.
+
+```{r, eval=FALSE}
+summary="exc1 Did not meet eligibility criteria: %sum%"
+```
+
+In the CONSORT diagram this generates the output:
+
+**Did not meet eligibility criteria: 124**
+
+---
+
 # Summary text + some finishing touches
 
 ```{r,message=FALSE,out.width="40%"}
@@ -254,8 +278,8 @@ print(names(cytomegalovirus),quote = FALSE)
 
 # Frequencies
 
-```{r, out.width="30%"}
-vtree(cytomegalovirus,"diagnosis",sameline=TRUE)
+```{r, out.width="25%"}
+vtree(cytomegalovirus,"diagnosis",pattern=TRUE)
 ```
 
 ```{r,message=FALSE,out.width="30%",eval=FALSE,echo=FALSE}
@@ -284,7 +308,7 @@ stemcell <- cytomegalovirus %>%
     c1c2             = fct_recode(as.character(`C1/C2`), Heterozygous="0", Homozygous="1"))  
 ```
 
-```{r,message=FALSE,out.width="40%"}
+```{r,message=FALSE,out.width="40%", eval=FALSE, echo=FALSE}
 vtree(stemcell, "prior.transplant", showvarnames=FALSE)
 ```
 
