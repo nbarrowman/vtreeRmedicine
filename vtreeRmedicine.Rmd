@@ -126,19 +126,19 @@ library(vtree)
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(dplyr)
 p <- build.data.frame(
-  c(  "rand","exc1","exc2","oth1", "group","died","dis1","dis2","dis3","fu"),
-  list(F,    T,     F,     F,      NA,     NA,    NA,    NA,    NA,    FALSE, 124),
-  list(F,    F,     T,     F,      NA,     NA,    NA,    NA,    NA,    FALSE, 11),
-  list(F,    F,     F,     T,      NA,     NA,    NA,    NA,    NA,    FALSE, 2),
-  list(T,    F,     F,     F,      "A",    F,     T,     F,     F,     FALSE, 11),
-  list(T,    F,     F,     F,      "A",    F,     F,     T,     F,     FALSE, 43),
-  list(T,    F,     F,     F,      "A",    F,     F,     F,     T,     FALSE, 13),
-  list(T,    F,     F,     F,      "A",    F,     F,     F,     F,     TRUE, 1053),
-  list(T,    F,     F,     F,      "B",    T,     F,     F,     F,     FALSE, 13),
-  list(T,    F,     F,     F,      "B",    F,     T,     F,     F,     FALSE, 9),
-  list(T,    F,     F,     F,      "B",    F,     F,     T,     F,     FALSE, 43),
-  list(T,    F,     F,     F,      "B",    F,     F,     F,     T,     FALSE, 12),
-  list(T,    F,     F,     F,      "B",    F,     F,     F,     F,     TRUE, 1049))
+  c(  "rand","exc1","exc2","oth1", "group",    "died","dis1","dis2","dis3","fu"),
+  list(F,    T,     F,     F,      NA,         NA,    NA,    NA,    NA,    FALSE, 124),
+  list(F,    F,     T,     F,      NA,         NA,    NA,    NA,    NA,    FALSE, 11),
+  list(F,    F,     F,     T,      NA,         NA,    NA,    NA,    NA,    FALSE, 2),
+  list(T,    F,     F,     F,      "paxlovid", F,     T,     F,     F,     FALSE, 11),
+  list(T,    F,     F,     F,      "paxlovid", F,     F,     T,     F,     FALSE, 43),
+  list(T,    F,     F,     F,      "paxlovid", F,     F,     F,     T,     FALSE, 13),
+  list(T,    F,     F,     F,      "paxlovid", F,     F,     F,     F,     TRUE, 1053),
+  list(T,    F,     F,     F,      "placebo",  T,     F,     F,     F,     FALSE, 13),
+  list(T,    F,     F,     F,      "placebo",  F,     T,     F,     F,     FALSE, 9),
+  list(T,    F,     F,     F,      "placebo",  F,     F,     T,     F,     FALSE, 43),
+  list(T,    F,     F,     F,      "placebo",  F,     F,     F,     T,     FALSE, 12),
+  list(T,    F,     F,     F,      "placebo",  F,     F,     F,     F,     TRUE, 1049))
 #illustrate <- c(1,125,136,138,149,192,205,1258,1271,1380,1423,1435)
 illustrate <- c(125,1380,192,205,1258,1)
 p <- rbind(p[illustrate,],p[-illustrate,])
