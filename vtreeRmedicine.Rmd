@@ -22,7 +22,7 @@ options(width=132)
 
 ---
 
-# **Outline of this talk**
+# **Outline**
 
 &nbsp;
 
@@ -81,6 +81,12 @@ knitr::include_graphics("biden.png")
 knitr::include_graphics("paxlovid.png")
 ```
 
+---
+
+```{r, echo=FALSE, fig.alt="Hammond J, Leister-Tebbe H, Gardner A, et al. Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19. N Engl J Med. 2022;386(15):1397-1408.",out.width="65%",fig.align = 'center'}
+knitr::include_graphics("paxlovid2.png")
+```
+
 ```{r, eval=FALSE,echo=FALSE}
 ---
 
@@ -115,10 +121,10 @@ making a tree of nested subsets based on the values of variables.
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(vtree)
-library(dplyr)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+library(dplyr)
 p <- build.data.frame(
   c(  "rand","exc1","exc2","oth1", "group","died","dis1","dis2","dis3","fu"),
   list(F,    T,     F,     F,      NA,     NA,    NA,    NA,    NA,    FALSE, 124),
@@ -141,13 +147,9 @@ p <- data.frame(tibble(p)) # reset row numbers
 
 # A data frame for the paxlovid CONSORT diagram
 
-* I noticed an apparent error in the published CONSORT diagram: 2396 patients were assessed for eligibility and then 137 were excluded (which would leave **2259**) but the diagram indicates that only **2246** were randomized
-
-* I will assume 2396 is a misprint, and that in fact 2383 were assessed for eligibility
-
 * **vtree** takes a data frame as input
 
-* I made a data frame, `p`, representing the flow of each patient
+* I made a data frame, `p`, with one row for each patient and columns describing the flow
 
 ```{r}
 dim(p)
@@ -159,13 +161,14 @@ head(p)
 
 ---
 
-# A single layer tree
+# A single-layer tree
 
 ```{r}
 table(p$rand)
 ```
 
-```{r,message=FALSE,out.width="40%"}
+```{r,message=FALSE,warning=FALSE,out.width="40%"}
+library(vtree)
 vtree(p, "rand", horiz=FALSE)
 ```
 
@@ -173,7 +176,7 @@ vtree(p, "rand", horiz=FALSE)
 
 # A two-layer tree
 
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 table(p$rand, p$group, exclude=NULL)
 ```
 
@@ -211,13 +214,17 @@ vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALS
 
 # Summaries in vtree
 
+The `summary` parameter lets you display information about other variables within a subset
+
 ```{r, eval=FALSE}
 summary="variable_name format_string"
 ```
 
-The format string consists of text and special codes.
+where `format_string` consists of text and special codes.
 
-For example, `exc1` indicates whether an individual was excluded because they didn't meet eligibility criteria.
+&nbsp;
+
+For example, how many patients were excluded because they didn't meet eligibility criteria (`exc1`)?
 
 ```{r, eval=FALSE}
 summary="exc1 Did not meet eligibility criteria: %sum%"
@@ -225,11 +232,11 @@ summary="exc1 Did not meet eligibility criteria: %sum%"
 
 In the CONSORT diagram this generates the output:
 
-**Did not meet eligibility criteria: 124**
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Did not meet eligibility criteria: 124**
 
 ---
 
-# Summary text + some finishing touches
+# A detailed CONSORT diagram
 
 ```{r,message=FALSE,out.width="40%"}
 vtree(p, "rand group fu", follow=list(rand=TRUE), horiz=FALSE, showvarnames=FALSE, title="Assessed for eligibility", 
@@ -270,7 +277,7 @@ library(medicaldata)
 dim(cytomegalovirus)
 ```
 
-```{r}
+```{r,eval=FALSE,echo=FALSE}
 print(names(cytomegalovirus),quote = FALSE)
 ```
 
@@ -292,7 +299,7 @@ vtree(cytomegalovirus, "prior.transplant", labelnode=list(prior.transplant=c(No=
 
 ---
 
-# For convenience, I'll relabel some variables
+# For convenience, I'll assign some interpretable factor levels
 
 ```{r, warning=FALSE, message=FALSE}
 library(forcats)
@@ -332,7 +339,7 @@ vtree(stemcell, "sex c1c2 prior.radiation", sameline=TRUE, showvarnames=FALSE, s
 
 # Quantitative variables
 
-Although vtree focuses on discrete variables, it has some support for quantitative variables.
+Although vtree focuses on discrete variables, it can display summaries of quantitative variables
 
 > The primary risk factor of interest was the number of activating killer
 > immunoglobulin-like receptors (aKIRs: 1-4 vs. 5-6).
