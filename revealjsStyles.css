@@ -1,0 +1,70 @@
+.slide {
+  font-size: 24pt;
+}
+
+#nextsteps {
+   color: blue;
+}
+
+blockquote {
+  font-style: italic;
+  font-size: 20pt;
+}
+
+
+.reveal h1 {
+    font-size: 36pt !important;
+    color: darkblue;
+}
+
+.reveal h2 {
+    font-size: 32pt !important;
+    color: darkblue;
+}
+
+.reveal h3 {
+    font-size: 32pt !important;
+    color: red;
+}
+
+.reveal h5 {
+    margin-top: 12pt;
+    font-size: 28pt !important;
+    color: #2554C7;
+    text-align: center;
+}
+
+.reveal h6 {
+    margin-top: 48pt;
+    font-size: 48pt !important;
+    color: #2554C7;
+    text-align: center;
+}
+
+ins {
+   font-size: 48pt;
+   color: DarkGreen;
+   text-decoration: none;
+}
+
+.reveal pre.sourceCode code {
+  background: WhiteSmoke;
+  font-weight: bold;
+  font-size: 14pt;
+  line-height: 110%;  
+}
+
+
+.reveal pre code {
+  font-weight: bold;
+  font-size: 14pt;
+  color: DimGray;
+  font-family: monospace;
+}
+
+.reveal code {
+  font-weight: bold;
+  font-size: 20pt;
+  color: SteelBlue;
+  font-family: monospace;
+}
